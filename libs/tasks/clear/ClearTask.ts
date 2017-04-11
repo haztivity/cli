@@ -11,7 +11,8 @@ import * as notify from "node-notifier";
 import * as gulpClean from "gulp-clean";
 const haztivityCliConfig = ConfigService.getInstance().getConfig();
 export class ClearTask extends BaseTask{
-    protected _name: string = "clear";
+    public static readonly NAME = "clear";
+    protected _name: string = "Clear";
     protected _gulpClean = gulpClean;
     protected _options:HaztivityCliConfig;
     constructor(options:HaztivityCliConfig){

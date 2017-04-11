@@ -8,7 +8,7 @@ const haztivityCliConfig = ConfigService_1.ConfigService.getInstance().getConfig
 class ClearTask extends BaseTask_1.BaseTask {
     constructor(options) {
         super();
-        this._name = "clear";
+        this._name = "Clear";
         this._gulpClean = gulpClean;
         this._options = this._joinOptions(options);
     }
@@ -17,5 +17,6 @@ class ClearTask extends BaseTask_1.BaseTask {
             .pipe(this._gulpClean({ force: true }));
     }
 }
+ClearTask.NAME = "clear";
 exports.ClearTask = ClearTask;
 //# sourceMappingURL=ClearTask.js.map

@@ -11,9 +11,9 @@ import * as notify from "node-notifier";
 import * as gulpStreamToPromise from 'gulp-stream-to-promise';
 import * as q from "q";
 import * as jspm from "jspm";
-import * as gulpSync from "gulp-sync";
+import {LoggerLevel} from "@sokka/gulp-build-tasks/libs/Logger";
 const haztivityCliConfig = ConfigService.getInstance().getConfig();
-export interface IDistTaskOptions extends ITaskOptions{
+export interface IBundleTaskOptions extends ITaskOptions{
     src?: string;
     dest?: string;
     options?:{
@@ -35,9 +35,10 @@ export interface IRunConfig{
  * @extends BaseTask
  * @description Tarea de distribución
  */
-export class DistTask extends BaseTask{
+export class BundleTask extends BaseTask{
+    public static readonly NAME = "bundle";
     //extend from defaults of BaseTask
-    protected static readonly DEFAULTS: IDistTaskOptions = extend(
+    protected static readonly DEFAULTS: IBundleTaskOptions = extend(
         true, {}, BaseTask.DEFAULTS, {
             src:path.join(haztivityCliConfig.src.path,"index.js"),
             dest:path.join(haztivityCliConfig.dest.path,"index.js"),
@@ -62,7 +63,7 @@ export class DistTask extends BaseTask{
             }
         }
     );
-    protected _name: string = "dist";
+    protected _name: string = "bundle";
     protected _options:HaztivityCliConfig;
     protected _jspmUtils:JspmUtils;
     protected _nodeNotify:notify.NodeNotifier = notify;
@@ -70,12 +71,13 @@ export class DistTask extends BaseTask{
     protected _q=q;
     constructor(options:HaztivityCliConfig){
         super();
+        this._logger.setLevel(LoggerLevel.verbose);
         this._options = this._joinOptions(options);
         this._jspmUtils = jspm;//JspmUtils.getInstance();
     }
 
     protected _getDefaults(){
-        return DistTask.DEFAULTS;
+        return BundleTask.DEFAULTS;
     }
     /**
      * Genera el bundle mediante jspm
@@ -87,6 +89,8 @@ export class DistTask extends BaseTask{
         let defer = this._q.defer(),
             src = this._path.join(this._options.src.path,this._options.bundle.src),
             dest = this._path.join(this._options.dest.path,this._options.bundle.dest);
+            this._logger.log(this._name,`JSPM bundle-sfx src:${src}`);
+            this._logger.log(this._name,`JSPM bundle-sfx dest:${dest}`);
         try {
             this._jspmUtils.bundleSFX(src, dest, options).then(this._onBundleSuccess.bind(this, defer)).catch(this._onDistFail.bind(this, defer));
         }catch(e){
@@ -177,26 +181,4 @@ export class DistTask extends BaseTask{
         );
         this._q.all([bundlePromise,copyPromise]).then(this._onDistSuccess.bind(this,cb)).catch(this._onDistFail.bind(this,defer));
     }
-    /**
-     * Register the tasks
-     * @param gulp
-     * @param task
-     */
-    static registerTasks(gulp) {
-        let gulpSyncronizer = gulpSync(gulp);
-        let config = ConfigService.getInstance().getConfig();
-        let task = new DistTask(config);
-        let name = task._name.toLowerCase();
-        gulp.task(
-            `_${name}`, function (cb) {
-                return task.run(cb);
-            }
-        );
-        gulp.task("dist",gulpSyncronizer.sync([
-            'clear',
-            //["typescript:build","sass:build"],
-            `_${name}`
-        ]));
-    };
-
 }

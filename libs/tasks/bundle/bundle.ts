@@ -2,12 +2,12 @@
  * @license
  * Copyright Davinchi. All Rights Reserved.
  */
-import {ClearTask} from "./ClearTask";
+import {BundleTask} from "./BundleTask";
 import * as gulp from "gulp";
 import {ConfigService} from "../../ConfigService";
 let config = ConfigService.getInstance().getConfig();
-let task = new ClearTask(config);
-ClearTask.registerTasks(gulp,{
-    taskClass:ClearTask,
+let task = new BundleTask(config);
+BundleTask.registerTasks(gulp,{
+    taskClass:BundleTask,
     taskInstance:task
 });
