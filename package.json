@@ -1,0 +1,41 @@
+{
+  "name": "haztivity-cli",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@bitbucket.org/davinchi_finsi/haztivity-cli.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "homepage": "https://bitbucket.org/davinchi_finsi/haztivity-cli#readme",
+  "dependencies": {
+    "@sokka/gulp-build-tasks": "^0.3.2",
+    "@types/q": "^1.0.0",
+    "gulp-clean": "^0.3.2",
+    "gulp-stream-to-promise": "^0.1.0",
+    "gulp-sync": "^0.1.4",
+    "node-notifier": "^5.1.2",
+    "q": "^1.5.0",
+    "vorpal": "^1.12.0"
+  },
+  "devDependencies": {
+    "@types/node-notifier": "0.0.28"
+  },
+  "jspm": {
+    "directories": {
+      "baseURL": "test"
+    },
+    "dependencies": {
+      "font-awesome": "npm:font-awesome@^4.7.0",
+      "jquery": "npm:jquery@^3.2.1"
+    },
+    "devDependencies": {
+      "typescript": "npm:typescript@^2.0.7"
+    }
+  }
+}
