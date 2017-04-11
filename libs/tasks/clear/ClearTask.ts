@@ -5,7 +5,7 @@
 import * as extend from "extend";
 //import {JspmUtils} from "@sokka/gulp-build-tasks/JspmUtils";
 import {BaseTask, IProcessParams, ITaskOptions,ITaskDestOptions} from "@sokka/gulp-build-tasks/libs/tasks/BaseTask";
-import {ConfigService,HaztivityCliConfig} from "../../ConfigService";
+import {ConfigService,IHaztivityCliConfig} from "../../ConfigService";
 import * as path from "path";
 import * as notify from "node-notifier";
 import * as gulpClean from "gulp-clean";
@@ -14,8 +14,8 @@ export class ClearTask extends BaseTask{
     public static readonly NAME = "clear";
     protected _name: string = "Clear";
     protected _gulpClean = gulpClean;
-    protected _options:HaztivityCliConfig;
-    constructor(options:HaztivityCliConfig){
+    protected _options:IHaztivityCliConfig;
+    constructor(options:IHaztivityCliConfig){
         super();
         this._options = this._joinOptions(options);
     }

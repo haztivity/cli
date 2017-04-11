@@ -2,8 +2,8 @@
  * @license
  * Copyright Davinchi. All Rights Reserved.
  */
-import {HaztivityCliConfit} from "./libs/ConfigService";
-export const config:HaztivityCliConfit = {
+import {ConfigService,IHaztivityCliConfig} from "./libs/ConfigService";
+export const config:IHaztivityCliConfig = {
     src:{
         path:"./src"
     },

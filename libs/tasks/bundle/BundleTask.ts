@@ -5,7 +5,7 @@
 import * as extend from "extend";
 //import {JspmUtils} from "@sokka/gulp-build-tasks/JspmUtils";
 import {BaseTask, IProcessParams, ITaskOptions,ITaskDestOptions} from "@sokka/gulp-build-tasks/libs/tasks/BaseTask";
-import {ConfigService,HaztivityCliConfig} from "../../ConfigService";
+import {ConfigService,IHaztivityCliConfig} from "../../ConfigService";
 import * as path from "path";
 import * as notify from "node-notifier";
 import * as gulpStreamToPromise from 'gulp-stream-to-promise';
@@ -64,12 +64,12 @@ export class BundleTask extends BaseTask{
         }
     );
     protected _name: string = "bundle";
-    protected _options:HaztivityCliConfig;
+    protected _options:IHaztivityCliConfig;
     protected _jspmUtils:JspmUtils;
     protected _nodeNotify:notify.NodeNotifier = notify;
     protected _gulpStreamToPromise=gulpStreamToPromise;
     protected _q=q;
-    constructor(options:HaztivityCliConfig){
+    constructor(options:IHaztivityCliConfig){
         super();
         this._logger.setLevel(LoggerLevel.verbose);
         this._options = this._joinOptions(options);

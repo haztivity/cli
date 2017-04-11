@@ -3,16 +3,17 @@
  * Copyright Davinchi. All Rights Reserved.
  */
 import {GBTApi} from "@sokka/gulp-build-tasks";
-import {BaseCommand, ICommandArgument} from "./BaseCommand";
-export class BundleCommand extends BaseCommand{
+import {ICommandArgument} from "../BaseCommand";
+import {GulpBaseCommand} from "./GulpBaseCommand";
+export class BundleCommand extends GulpBaseCommand{
     protected _command: string ="bundle";
-    protected _description: string="Construye el proyecto y genera un paquete de distribución";
+    protected _description: string="Genera un paquete de distribución";
 
     protected _arguments(): ICommandArgument[] {
         return [];
     }
 
-    protected _action() {
+    protected _task() {
         GBTApi.getInstance().run("bundle");
     }
 }

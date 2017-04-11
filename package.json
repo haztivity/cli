@@ -6,6 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "bin": {
+    "haztivity": "bin/cli.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+ssh://git@bitbucket.org/davinchi_finsi/haztivity-cli.git"
@@ -25,19 +28,8 @@
     "winston": "^2.3.1"
   },
   "devDependencies": {
+    "@types/commander": "^2.3.31",
     "@types/node-notifier": "0.0.28",
     "@types/winston": "^2.3.0"
-  },
-  "jspm": {
-    "directories": {
-      "baseURL": "test"
-    },
-    "dependencies": {
-      "font-awesome": "npm:font-awesome@^4.7.0",
-      "jquery": "npm:jquery@^3.2.1"
-    },
-    "devDependencies": {
-      "typescript": "npm:typescript@^2.0.7"
-    }
   }
 }

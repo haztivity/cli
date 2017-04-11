@@ -1,3 +1,5 @@
+import {IExportedCommand} from "commander";
+import {ConfigService, IHaztivityCliConfig} from "../ConfigService";
 /**
  * @license
  * Copyright Davinchi. All Rights Reserved.
@@ -7,11 +9,17 @@ export interface ICommandArgument{
     required?:boolean;
 }
 export abstract class BaseCommand{
-    protected _vorpal;
+    protected _commander;
+    protected _configService = ConfigService;
+    protected _haztivityConfig:IHaztivityCliConfig;
     protected abstract _command:string;
     protected abstract _description:string;
-    constructor(vorpal){
-        this._vorpal = vorpal;
+    constructor(commander:IExportedCommand){
+        this._commander = commander;
+        this._haztivityConfig = this._configService.getInstance().getConfig();
+        if(this._haztivityConfig == undefined){
+            process.exit(1);
+        }
     }
     protected _createCommand(){
         return `${this._command} ${this._stringifyArguments(this._arguments())}`;
@@ -30,8 +38,8 @@ export abstract class BaseCommand{
     protected abstract _arguments():ICommandArgument[];
     protected abstract _action();
     register(){
-        this._vorpal.command(this._createCommand())
+        this._commander.command(this._createCommand())
             .description(this._description)
-            .action(this._action);
+            .action(this._action.bind(this));
     }
 }
