@@ -9,7 +9,7 @@ const gulp = require("gulp");
 const ConfigService_1 = require("../../ConfigService");
 let config = ConfigService_1.ConfigService.getInstance().getConfig();
 let task = new BundleTask_1.BundleTask(config);
-BundleTask_1.BundleTask.registerTasks(gulp, {
+BundleTask_1.BundleTask.registerAsyncTasks(gulp, {
     taskClass: BundleTask_1.BundleTask,
     taskInstance: task
 });

@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
-    "haztivity": "bin/cli.js"
+    "hzcli": "bin/hzcli.js"
   },
   "repository": {
     "type": "git",
@@ -19,9 +19,12 @@
   "dependencies": {
     "@sokka/gulp-build-tasks": "^0.3.2",
     "@types/q": "^1.0.0",
+    "gulp": "^3.9.1",
     "gulp-clean": "^0.3.2",
+    "gulp-html-replace": "^1.6.2",
     "gulp-stream-to-promise": "^0.1.0",
     "gulp-sync": "^0.1.4",
+    "jspm-git": "^0.6.0",
     "node-notifier": "^5.1.2",
     "q": "^1.5.0",
     "vorpal": "^1.12.0",
@@ -31,5 +34,17 @@
     "@types/commander": "^2.3.31",
     "@types/node-notifier": "0.0.28",
     "@types/winston": "^2.3.0"
+  },
+  "jspm": {
+    "directories": {
+      "baseURL": "test"
+    },
+    "dependencies": {
+      "font-awesome": "npm:font-awesome@^4.7.0",
+      "jquery": "npm:jquery@^3.2.1"
+    },
+    "devDependencies": {
+      "typescript": "npm:typescript@^2.0.7"
+    }
   }
 }

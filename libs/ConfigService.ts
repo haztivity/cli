@@ -8,13 +8,8 @@ import {ITaskOptions} from "@sokka/gulp-build-tasks/libs/tasks/BaseTask";
 import {Logger} from "@sokka/gulp-build-tasks/libs/Logger";
 import * as extend from "extend";
 export interface IHaztivityCliConfig extends ITaskOptions{
-    dest:{
-        exclude?:String[];
-        path:string;
-    },
-    src:{
-        path:string;
-    },
+    dest:string,
+    base:string,
     bundle:IBundleTaskOptions
 }
 export class ConfigService{
@@ -31,10 +26,7 @@ export class ConfigService{
         try{
             result = require(this._path.join(process.cwd(),"haztivitycli.config.js"));
             if(result.config){
-                result = result.config
-                if(!result.src || !result.src.path || !result.dest || !result.dest.path){
-                    result = null;
-                }
+                result = result.config;
             }
         }catch(e){
         }

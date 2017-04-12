@@ -13,7 +13,7 @@ class ClearTask extends BaseTask_1.BaseTask {
         this._options = this._joinOptions(options);
     }
     run() {
-        return this._gulp.src(this._options.dest.path)
+        return this._gulp.src(this._path.join(this._options.base, this._options.dest))
             .pipe(this._gulpClean({ force: true }));
     }
 }

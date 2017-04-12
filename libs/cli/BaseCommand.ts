@@ -1,5 +1,4 @@
 import {IExportedCommand} from "commander";
-import {ConfigService, IHaztivityCliConfig} from "../ConfigService";
 /**
  * @license
  * Copyright Davinchi. All Rights Reserved.
@@ -10,16 +9,10 @@ export interface ICommandArgument{
 }
 export abstract class BaseCommand{
     protected _commander;
-    protected _configService = ConfigService;
-    protected _haztivityConfig:IHaztivityCliConfig;
     protected abstract _command:string;
     protected abstract _description:string;
     constructor(commander:IExportedCommand){
         this._commander = commander;
-        this._haztivityConfig = this._configService.getInstance().getConfig();
-        if(this._haztivityConfig == undefined){
-            process.exit(1);
-        }
     }
     protected _createCommand(){
         return `${this._command} ${this._stringifyArguments(this._arguments())}`;

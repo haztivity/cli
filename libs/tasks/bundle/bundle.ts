@@ -7,7 +7,7 @@ import * as gulp from "gulp";
 import {ConfigService} from "../../ConfigService";
 let config = ConfigService.getInstance().getConfig();
 let task = new BundleTask(config);
-BundleTask.registerTasks(gulp,{
+BundleTask.registerAsyncTasks(gulp,{
     taskClass:BundleTask,
     taskInstance:task
 });

@@ -3,25 +3,20 @@
  * Copyright Davinchi. All Rights Reserved.
  */
 import * as extend from "extend";
-//import {JspmUtils} from "@sokka/gulp-build-tasks/JspmUtils";
-import {BaseTask, IProcessParams, ITaskOptions,ITaskDestOptions} from "@sokka/gulp-build-tasks/libs/tasks/BaseTask";
+import {JspmUtils} from "@sokka/gulp-build-tasks";
+import {BaseTask} from "@sokka/gulp-build-tasks/libs/tasks/BaseTask";
+import {IProcessParams, ITaskOptions,ITaskDestOptions,IJSPMBundleOptions} from "@sokka/gulp-build-tasks";
 import {ConfigService,IHaztivityCliConfig} from "../../ConfigService";
-import * as path from "path";
+import * as gulpHtmlReplace from "gulp-html-replace";
 import * as notify from "node-notifier";
 import * as gulpStreamToPromise from 'gulp-stream-to-promise';
 import * as q from "q";
-import * as jspm from "jspm";
 import {LoggerLevel} from "@sokka/gulp-build-tasks/libs/Logger";
 const haztivityCliConfig = ConfigService.getInstance().getConfig();
 export interface IBundleTaskOptions extends ITaskOptions{
     src?: string;
     dest?: string;
-    options?:{
-        mangle?:boolean;
-        minify?:boolean;
-        lowResSourceMaps?:boolean;
-        sourceMaps?:boolean;
-    };
+    options?:IJSPMBundleOptions;
     copy?:String[]
 }
 export interface IRunConfig{
@@ -40,13 +35,15 @@ export class BundleTask extends BaseTask{
     //extend from defaults of BaseTask
     protected static readonly DEFAULTS: IBundleTaskOptions = extend(
         true, {}, BaseTask.DEFAULTS, {
-            src:path.join(haztivityCliConfig.src.path,"index.js"),
-            dest:path.join(haztivityCliConfig.dest.path,"index.js"),
+            bundle:{
+                src: "index.js",
+                dest: "index.js"
+            },
             options:{
-                mangle:false,
-                minify:false,
+                mangle:true,
+                minify:true,
                 lowResSourceMaps:true,
-                sourceMaps:true
+                sourceMaps:false
             },
             copy:[],
             notify: {
@@ -65,15 +62,16 @@ export class BundleTask extends BaseTask{
     );
     protected _name: string = "bundle";
     protected _options:IHaztivityCliConfig;
-    protected _jspmUtils:JspmUtils;
+    protected _jspmUtils:JspmUtils = JspmUtils.getInstance();
+    protected _jspm = this._jspmUtils.getJspm();
     protected _nodeNotify:notify.NodeNotifier = notify;
     protected _gulpStreamToPromise=gulpStreamToPromise;
+    protected _gulpHtmlReplace = gulpHtmlReplace;
     protected _q=q;
     constructor(options:IHaztivityCliConfig){
         super();
         this._logger.setLevel(LoggerLevel.verbose);
         this._options = this._joinOptions(options);
-        this._jspmUtils = jspm;//JspmUtils.getInstance();
     }
 
     protected _getDefaults(){
@@ -87,26 +85,31 @@ export class BundleTask extends BaseTask{
     protected _makeBundle(options:IRunConfig):Q.Promise<any>{
         //todo resolve src path
         let defer = this._q.defer(),
-            src = this._path.join(this._options.src.path,this._options.bundle.src),
-            dest = this._path.join(this._options.dest.path,this._options.bundle.dest);
-            this._logger.log(this._name,`JSPM bundle-sfx src:${src}`);
-            this._logger.log(this._name,`JSPM bundle-sfx dest:${dest}`);
+            promise = defer.promise,
+            src = this._options.bundle.src,
+            dest = this._path.join(this._options.base,this._options.dest,this._options.bundle.dest);
+            this._logger.info(`JSPM bundle-sfx expression:${src}, dest:${dest}`);
         try {
-            this._jspmUtils.bundleSFX(src, dest, options).then(this._onBundleSuccess.bind(this, defer)).catch(this._onDistFail.bind(this, defer));
+            let time = new Date();
+            this._jspm.bundleSFX(src, dest, options).then(this._onBundleSuccess.bind(this, defer,time)).catch(this._onDistFail.bind(this, defer));
         }catch(e){
+            defer.reject(e);
             this._onDistFail(defer,e);
         }
-        return defer.promise;
+        return promise;
     }
 
     /**
      * Invocado al finalizarse la tarea satisfactoriamente
      * @private
      */
-    protected _onDistSuccess(cb){
+    protected _onDistSuccess(cb,time){
+        let timeEnd = new Date();
+        let timeSpent = (timeEnd.getTime()-time.getTime())/1000;
+        this._logger.info(`bundle finished after ${timeSpent}s`);
         this._nodeNotify.notify({
             title:this._name,
-            message:"Bundle sfx created"
+            message:`Bundle created after ${timeSpent}s`
         });
         cb();
     }
@@ -122,17 +125,20 @@ export class BundleTask extends BaseTask{
             message:err.stack
         });
         defer.reject(err);
-        throw err;
+        this._logger.error(err.message);
     }
 
     /**
      * Invocado al generarse el bundle satisfactoriamente
      * @private
      */
-    protected _onBundleSuccess(defer){
+    protected _onBundleSuccess(defer,time){
+        let timeEnd = new Date();
+        this._logger.log(`JSPM bundle-sfx created after ${(timeEnd.getTime()-time.getTime())/1000} s`);
         defer.resolve();
     }
     protected _copy(files,dest:ITaskDestOptions):Promise<any>{
+        this._logger.info("Copying files");
         let stream = this._vfs.src(files)
         //catch errors
             .pipe(this._gulpPlumber({errorHandler: this._gulpNotifyError()}))//notifyError generates the config
@@ -157,28 +163,73 @@ export class BundleTask extends BaseTask{
      */
     protected _resolveFiles(files) {
         let result = [],
-            src = this._options.base;
+            base = this._options.base;
         if (!Array.isArray(files)) {
             files = [files];
         }
         for (let file of files) {
-            result.push(this._path.join(src, file));
+            result.push(this._path.join(base, file));
         }
         return result;
     }
-    //make bundle
-    //copy dependencies
-    //copy others
+    protected _replaceSystem(files,bundle,dest:ITaskDestOptions){
+        this._logger.info("Replazing system scripts in files");
+        let stream = this._vfs.src(files)
+        //catch errors
+            .pipe(this._gulpPlumber({errorHandler: this._gulpNotifyError()}))//notifyError generates the config
+            //log src files if verbose
+            .pipe(
+                this._options.verbose
+                    ? this._gulpDebug({title: this._getLogMessage("Files")})
+                    : this._gutil.noop()
+            )
+            .pipe(
+                this._gulpHtmlReplace(
+                    {
+                        system: "",
+                        bundle:bundle,
+                    },
+                    {
+                        keepUnassigned: false,
+                        keepBlockTags: false
+                    }
+                )
+            )
+            .pipe(
+                this._vfs.dest(
+                    dest.path,
+                    dest.options
+                )
+            );
+        let promise = this._gulpStreamToPromise(stream);
+        return promise;
+    }
+    protected _onBundleAndCopySuccess(cb,time,defer){
+        this._replaceSystem([
+            this._path.join(this._options.base,this._options.dest,"**/**.html")
+        ],this._options.bundle.dest,{
+            path: this._path.join(this._options.base,this._options.dest)
+        }).then(this._onDistSuccess.bind(this,cb,time)).catch(this._onDistFail.bind(this,defer));
+    }
     public run(cb,options:IRunConfig={}){
-        let defer = this._q.defer();
-        let _options = this._extend(true,{},this._options.bundle.options||{},options);
-        let bundlePromise = this._makeBundle(_options);
-        let copyPromise = this._copy(
-            this._resolveFiles(this._options.bundle.copy),
-            {
-                path:this._options.dest.path
-            }
-        );
-        this._q.all([bundlePromise,copyPromise]).then(this._onDistSuccess.bind(this,cb)).catch(this._onDistFail.bind(this,defer));
+        let defer = this._q.defer(),
+            jspmAvailable = this._jspmUtils.isAvailable();
+        if(jspmAvailable == true) {
+            let time = new Date();
+            let _options = this._extend(true, {}, this._options.bundle.options || {}, options);
+            let bundlePromise = this._makeBundle(_options);
+            let files = this._resolveFiles(this._options.bundle.copy);
+            let toExclude = this._joinExcludeFiles([],{jspm:false,npm:true,bower:true});
+            let copyPromise = this._copy(
+                toExclude.concat(files),
+                {
+                    path: this._path.join(this._options.base,this._options.dest)
+                }
+            );
+            this._q.all([bundlePromise, copyPromise]).then(this._onBundleAndCopySuccess.bind(this, cb,time,defer)).catch(this._onDistFail.bind(this, defer));
+        }else{
+            this._logger.error("JSPM is not available:",jspmAvailable);
+            process.exit(1);
+        }
     }
 }

@@ -1,0 +1,15 @@
+doctype
+html
+    head
+        // build:system
+        script(src='../jspm_packages/system.js')
+        script(src='../config.js')
+        script.
+            SystemJS.import("./index.js");
+        // endbuild
+    body
+        div
+            p Hi
+            i.fa.fa-user
+        // build:bundle
+        // endbuild
