@@ -4,18 +4,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * @license
  * Copyright Davinchi. All Rights Reserved.
  */
-var path = require("path");
-var Logger_1 = require("@sokka/gulp-build-tasks/libs/Logger");
-var extend = require("extend");
-var ConfigService = (function () {
-    function ConfigService() {
+const path = require("path");
+const extend = require("extend");
+class ConfigService {
+    constructor() {
         this._path = path;
-        this._logger = Logger_1.Logger.getInstance();
+        //protected _logger = Logger.getInstance();
         this._extend = extend;
         this.loadConfig();
     }
-    ConfigService.prototype._readConfigFile = function () {
-        var result = null;
+    _readConfigFile() {
+        let result = null;
         try {
             result = require(this._path.join(process.cwd(), "haztivitycli.config.js"));
             if (result.config) {
@@ -23,27 +22,42 @@ var ConfigService = (function () {
             }
         }
         catch (e) {
+            //todo throw error
         }
         return result;
-    };
-    ConfigService.prototype.loadConfig = function () {
-        var config = this._readConfigFile();
+    }
+    loadConfig() {
+        let config = this._readConfigFile();
         if (config) {
-            this._config = config;
+            this._config = this._extend(true, {}, ConfigService.DEFAULTS, config);
         }
         else {
-            this._logger.error("Haztivity", "haztivitycli.config.js not found. Please init haztivity");
+            //todo throw error
+            //this._logger.error("Haztivity","haztivitycli.config.js not found. Please init haztivity");
         }
-    };
-    ConfigService.prototype.getConfig = function () {
+        return this;
+    }
+    getConfig() {
+        this.loadConfig();
         return this._config;
-    };
-    ConfigService.getInstance = function () {
+    }
+    static getInstance() {
         if (!ConfigService._instance) {
             ConfigService._instance = new ConfigService();
         }
         return ConfigService._instance;
-    };
-    return ConfigService;
-}());
+    }
+}
+ConfigService.DEFAULTS = {
+    homeDir: "course",
+    scoTest: /sco*/i,
+    scoDir: ".",
+    bundlesDir: "../bundles",
+    dev: {
+        server: {
+            port: 8080
+        }
+    }
+};
 exports.ConfigService = ConfigService;
+//# sourceMappingURL=ConfigService.js.map
