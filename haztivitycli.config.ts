@@ -17,5 +17,6 @@ export const config:IHaztivityCliConfig = {
             log:true,
             debug:true
         }
-    }
+    },
+    logLevel:LogLevel.TRACE
 };

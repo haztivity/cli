@@ -5,33 +5,58 @@
 import * as path from "path";
 import * as extend from "extend";
 import {FuseBoxOptions} from "fuse-box/dist/typings/core/FuseBox";
+import {Logger} from "./logger/Logger";
+export const enum LogLevel {
+    TRACE = 0,
+    DEBUG = 1,
+    INFO = 2,
+    WARN = 3,
+    ERROR = 4,
+    SILENT = 5
+}
 export interface IHaztivityCliConfig{
     homeDir?:string;
     scoTest?:string|RegExp;
-    bundlesDir?:string;
     scoDir?:string;
     dev?:{
+        outputDir?:string;
         server?:{
             root?:string;
             port?:number;
             hmr?:boolean;
         },
         fusebox?:FuseBoxOptions
-    }
+    },
+    dist?:{
+        outputDir?:string;
+        fusebox?:FuseBoxOptions;
+        copy?:string[];
+    },
+    logLevel?:LogLevel
 }
 export class ConfigService{
     protected static readonly DEFAULTS:IHaztivityCliConfig = {
         homeDir:"course",
         scoTest:/sco*/i,
         scoDir:".",
-        bundlesDir:"../bundles",
         dev:{
+            outputDir:"bundles",
             server:{
                 port:8080
             }
-        }
+        },
+        dist:{
+            outputDir:"dist",
+            copy:[
+                "**/*.(ttf|otf|woff|wof2|eot)",
+                "{{homeDir}}/**/*.(jpg|png|jpeg|gif)",
+                "{{homeDir}}/**/index.html"
+            ]
+        },
+        logLevel:LogLevel.INFO
     };
     protected static _instance:ConfigService;
+    protected _logger = Logger.getInstance();
     protected _config:IHaztivityCliConfig;
     protected _path = path;
     //protected _logger = Logger.getInstance();
@@ -48,16 +73,37 @@ export class ConfigService{
             }
         }catch(e){
             //todo throw error
+            this._logger.error("Fail to read haztivitycli.config.js. Maybe it's malformed?");
         }
         return result;
+    }
+
+    protected _processConfig(config){
+        if(config.dist && config.dist.copy){
+            let copy = config.dist.copy;
+            let homeDir = config.homeDir.replace(/^(\.\\|\.\/)/g,"");//replace .\ or ./ starts
+            for (let copyPath = 0, copyLength = copy.length; copyPath < copyLength; copyPath++) {
+                let current = copy[copyPath];
+                copy[copyPath] = current.replace("{{homeDir}}",homeDir);
+            }
+        }
+        return config;
     }
     public loadConfig(){
         let config = this._readConfigFile();
         if(config){
-            this._config = this._extend(true,{},ConfigService.DEFAULTS,config);
+            let distCopy = config && config.dist && config.dist.copy ? config.dist.copy : [];
+            config = this._extend(true,{},ConfigService.DEFAULTS,config);
+            if(distCopy.length > 0){
+                config.dist.copy = distCopy;
+            }
+            this._config = this._processConfig(config);
+            if(this._config.logLevel != undefined){
+                this._logger.setLevel(this._config.logLevel);
+            }
         }else{
             //todo throw error
-            //this._logger.error("Haztivity","haztivitycli.config.js not found. Please init haztivity");
+            this._logger.error("haztivitycli.config.js not found. Please init use 'hzcli' and 'init'");
         }
         return this;
     }

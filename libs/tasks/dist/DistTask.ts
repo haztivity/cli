@@ -8,27 +8,24 @@ import {ConfigService, IHaztivityCliConfig} from "../../ConfigService";
 import {PugPlugin} from "fusebox-pug-plugin";
 import * as extend from "extend";
 import * as path from "path";
-export interface IDevTaskOptions{
-    sco:string;
-    server?:IFuseBoxServerOptions
+export interface IDistTaskOptions{
+    scos:string[];
 }
-export class DevTask{
+export class DistTask{
     protected static readonly DEFAULTS={
-        server:{}
     };
     protected _configService = ConfigService.getInstance();
-    protected _options:IDevTaskOptions;
+    protected _options:IDistTaskOptions;
     protected _extend = extend;
     protected _path = path;
-    constructor(options:IDevTaskOptions){
-        this._options = this._extend(true,{},DevTask.DEFAULTS,options);
+    constructor(options:IDistTaskOptions){
+        this._options = this._extend(true,{},DistTask.DEFAULTS,options);
     }
     run(){
         let sassOptions={
-            outputStyle:"expanded"
+            outputStyle:"compressed"
         };
         let config:IHaztivityCliConfig = this._configService.getConfig();
-        let serverOptions = this._extend(true,{},config.dev.server || {},this._options.server);
         let fuseTask = new FuseboxTask(<IFuseBoxTaskConfig>{
             fusebox: {
                 homeDir: this._path.join(config.homeDir),
@@ -43,10 +40,10 @@ export class DevTask{
                     PugPlugin()
                 ]
             },
-            outDir:this._path.join(config.homeDir,"..",config.dev.outputDir),
-            sco:this._options.sco,
-            server:serverOptions,
+            copy:config.dist.copy,
+            outDir:this._path.normalize(config.dist.outputDir),
+            sco:this._options.scos[0]
         });
-        fuseTask.devServer();
+        return fuseTask.bundle();
     }
 }

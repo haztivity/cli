@@ -14,5 +14,6 @@ exports.config = {
             log: true,
             debug: true
         }
-    }
+    },
+    logLevel: 0 /* TRACE */
 };
