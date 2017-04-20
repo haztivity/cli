@@ -6,6 +6,7 @@ exports.config = {
     dev: {
         server: {
             root: ".",
+            port: 4444,
             hmr: true
         },
         fusebox: {

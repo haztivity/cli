@@ -31,7 +31,7 @@ export class DevTask{
         let serverOptions = this._extend(true,{},config.dev.server || {},this._options.server);
         let fuseTask = new FuseboxTask(<IFuseBoxTaskConfig>{
             fusebox: {
-                homeDir: this._path.resolve(config.homeDir),
+                homeDir: this._path.join(config.homeDir),
                 sourceMaps:true,
                 outFile:"bundle.js",
                 plugins:[
@@ -43,7 +43,7 @@ export class DevTask{
                     PugPlugin()
                 ]
             },
-            outDir:this._path.resolve(config.homeDir,config.bundlesDir),
+            outDir:this._path.join(config.homeDir,config.bundlesDir),
             sco:this._options.sco,
             server:serverOptions,
         });

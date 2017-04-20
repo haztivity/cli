@@ -4,17 +4,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * @license
  * Copyright Davinchi. All Rights Reserved.
  */
-const path = require("path");
-const extend = require("extend");
-class ConfigService {
-    constructor() {
+var path = require("path");
+var extend = require("extend");
+var ConfigService = (function () {
+    function ConfigService() {
         this._path = path;
         //protected _logger = Logger.getInstance();
         this._extend = extend;
         this.loadConfig();
     }
-    _readConfigFile() {
-        let result = null;
+    ConfigService.prototype._readConfigFile = function () {
+        var result = null;
         try {
             result = require(this._path.join(process.cwd(), "haztivitycli.config.js"));
             if (result.config) {
@@ -25,9 +25,9 @@ class ConfigService {
             //todo throw error
         }
         return result;
-    }
-    loadConfig() {
-        let config = this._readConfigFile();
+    };
+    ConfigService.prototype.loadConfig = function () {
+        var config = this._readConfigFile();
         if (config) {
             this._config = this._extend(true, {}, ConfigService.DEFAULTS, config);
         }
@@ -36,18 +36,19 @@ class ConfigService {
             //this._logger.error("Haztivity","haztivitycli.config.js not found. Please init haztivity");
         }
         return this;
-    }
-    getConfig() {
+    };
+    ConfigService.prototype.getConfig = function () {
         this.loadConfig();
         return this._config;
-    }
-    static getInstance() {
+    };
+    ConfigService.getInstance = function () {
         if (!ConfigService._instance) {
             ConfigService._instance = new ConfigService();
         }
         return ConfigService._instance;
-    }
-}
+    };
+    return ConfigService;
+}());
 ConfigService.DEFAULTS = {
     homeDir: "course",
     scoTest: /sco*/i,
@@ -60,4 +61,3 @@ ConfigService.DEFAULTS = {
     }
 };
 exports.ConfigService = ConfigService;
-//# sourceMappingURL=ConfigService.js.map
