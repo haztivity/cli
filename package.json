@@ -1,6 +1,6 @@
 {
   "name": "@haztivity/cli",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -8,6 +8,9 @@
   },
   "bin": {
     "hzcli": "bin/hzcli.js"
+  },
+  "publishConfig": {
+    "access":"public"
   },
   "repository": {
     "type": "git",
