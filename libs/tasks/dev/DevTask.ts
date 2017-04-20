@@ -33,6 +33,7 @@ export class DevTask{
             fusebox: {
                 homeDir: this._path.join(config.homeDir),
                 sourceMaps:true,
+                log:true,
                 outFile:"bundle.js",
                 plugins:[
                     [FuseBoxStatic.SassPlugin(sassOptions),FuseBoxStatic.CSSPlugin()],

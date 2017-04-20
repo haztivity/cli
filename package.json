@@ -17,6 +17,7 @@
   "license": "ISC",
   "homepage": "https://bitbucket.org/davinchi_finsi/haztivity-cli#readme",
   "dependencies": {
+    "@types/uglify-js": "^2.6.28",
     "cli-color": "^1.2.0",
     "commander": "^2.9.0",
     "extend": "^3.0.0",

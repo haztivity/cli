@@ -29,15 +29,17 @@ export class DistTask{
         let fuseTask = new FuseboxTask(<IFuseBoxTaskConfig>{
             fusebox: {
                 homeDir: this._path.join(config.homeDir),
-                sourceMaps:true,
+                sourceMaps:false,
                 outFile:"bundle.js",
+                log:true,
                 plugins:[
                     [FuseBoxStatic.SassPlugin(sassOptions),FuseBoxStatic.CSSPlugin()],
                     FuseBoxStatic.CSSPlugin(),
                     [FuseBoxStatic.SassPlugin(sassOptions),FuseBoxStatic.CSSResourcePlugin({})],
                     FuseBoxStatic.CSSResourcePlugin({}),
                     FuseBoxStatic.HTMLPlugin(),
-                    PugPlugin()
+                    PugPlugin(),
+                    FuseBoxStatic.UglifyJSPlugin(config.dist.uglify)
                 ]
             },
             copy:config.dist.copy,

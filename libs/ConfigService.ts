@@ -6,6 +6,7 @@ import * as path from "path";
 import * as extend from "extend";
 import {FuseBoxOptions} from "fuse-box/dist/typings/core/FuseBox";
 import {Logger} from "./logger/Logger";
+import * as UglifyJS from "uglify-js";
 export const enum LogLevel {
     TRACE = 0,
     DEBUG = 1,
@@ -31,6 +32,7 @@ export interface IHaztivityCliConfig{
         outputDir?:string;
         fusebox?:FuseBoxOptions;
         copy?:string[];
+        uglify?:any
     },
     logLevel?:LogLevel
 }
