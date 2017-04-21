@@ -20,6 +20,7 @@ export interface IHaztivityCliConfig{
     scoTest?:string|RegExp;
     scoDir?:string;
     dev?:{
+        bundleExpression?:string;
         outputDir?:string;
         server?:{
             root?:string;
@@ -29,6 +30,7 @@ export interface IHaztivityCliConfig{
         fusebox?:FuseBoxOptions
     },
     dist?:{
+        bundleExpression?:string;
         outputDir?:string;
         fusebox?:FuseBoxOptions;
         copy?:string[];
@@ -42,18 +44,27 @@ export class ConfigService{
         scoTest:/sco*/i,
         scoDir:".",
         dev:{
+            bundleExpression:">{{sco}}/index.ts",
             outputDir:"bundles",
             server:{
                 port:8080
+            },
+            fusebox:{
+                outFile:"bundle.js",
+                sourceMaps:true
             }
         },
         dist:{
+            bundleExpression:">{{sco}}/index.ts",
             outputDir:"dist",
             copy:[
                 "**/*.(ttf|otf|woff|wof2|eot)",
                 "{{homeDir}}/**/*.(jpg|png|jpeg|gif)",
                 "{{homeDir}}/**/index.html"
-            ]
+            ],
+            fusebox:{
+                outFile:"bundle.js"
+            }
         },
         logLevel:LogLevel.INFO
     };
@@ -75,7 +86,7 @@ export class ConfigService{
             }
         }catch(e){
             //todo throw error
-            this._logger.error("Fail to read haztivitycli.config.js. Maybe it's malformed?");
+            this._logger.error("Fail to read haztivitycli.config.js. Maybe it's malformed?",`Detail:${e.message}`);
         }
         return result;
     }

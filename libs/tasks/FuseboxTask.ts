@@ -12,6 +12,7 @@ export interface IFuseBoxServerOptions{
     port?:number;
 }
 export interface IFuseBoxTaskConfig{
+    bundleExpression:string;
     sco:string;
     outDir:string;
     copy?:string[];
@@ -100,7 +101,7 @@ export class FuseboxTask{
         promise.then(()=>{
             this._injectBundlePath(this._path.resolve(this._outDirSco,"**","*.html"),this._path.resolve(this._outFile)).then(()=>defer.resolve());
             this._logger.trace(`Bundle: sco path ${this._logger.color.cyan(this._path.resolve(this._options.fusebox.homeDir,this._options.sco))} to ${this._logger.color.cyan(this._path.resolve(this._outFile))}`);
-            fuse.bundle(`>${this._path.join(this._options.sco,"index.ts").replace("\\","/")}`);
+            fuse.bundle(this._options.bundleExpression.replace("{{sco}}",this._options.sco).replace("\\","/"));
         });
         return defer.promise;
     }
@@ -111,7 +112,7 @@ export class FuseboxTask{
         let promise = this._injectBundlePath(this._path.resolve(this._homeDir,this._options.sco,"**","*.html"),this._outFile);
         promise.then(()=>{
             this._logger.trace(`Bundle: sco path ${this._logger.color.cyan(this._path.resolve(this._options.fusebox.homeDir,this._options.sco))} to ${this._logger.color.cyan(this._path.resolve(this._outFile))}`);
-            fuse.devServer(`>${this._path.join(this._options.sco,"index.ts").replace("\\","/")}`,this._options.server);
+            fuse.devServer(this._options.bundleExpression.replace("{{sco}}",this._options.sco).replace("\\","/"),this._options.server);
         });
     }
     //bundle

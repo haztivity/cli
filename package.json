@@ -1,6 +1,6 @@
 {
   "name": "@haztivity/cli",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -25,7 +25,7 @@
     "commander": "^2.9.0",
     "extend": "^3.0.0",
     "fuse-box": "^1.3.131",
-    "fusebox-pug-plugin": "fusebox-pug-plugin@^1.0.0",
+    "fusebox-pug-plugin": "^1.0.0",
     "gulp-html-replace": "^1.6.2",
     "loglevel": "^1.4.1",
     "map-stream": "0.0.7",
@@ -40,5 +40,10 @@
     "@types/loglevel": "^1.4.29",
     "@types/node-notifier": "0.0.28",
     "@types/q": "^1.0.0"
+  },
+  "types":"./libs/index.ts",
+  "typings":"./libs/index.ts",
+  "directories": {
+    "typings":"./libs"
   }
 }

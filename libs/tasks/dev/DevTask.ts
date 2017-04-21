@@ -29,24 +29,22 @@ export class DevTask{
         };
         let config:IHaztivityCliConfig = this._configService.getConfig();
         let serverOptions = this._extend(true,{},config.dev.server || {},this._options.server);
+        let fuseOptions = this._extend(true,{},config.dev.fusebox);
+        fuseOptions.homeDir= this._path.join(config.homeDir);
+        fuseOptions.plugins=[
+            [FuseBoxStatic.SassPlugin(sassOptions),FuseBoxStatic.CSSPlugin()],
+            FuseBoxStatic.CSSPlugin(),
+            [FuseBoxStatic.SassPlugin(sassOptions),FuseBoxStatic.CSSResourcePlugin({})],
+            FuseBoxStatic.CSSResourcePlugin({}),
+            FuseBoxStatic.HTMLPlugin(),
+            PugPlugin({
+                useDefault:true,
+                hmr:false
+            })
+        ];
         let fuseTask = new FuseboxTask(<IFuseBoxTaskConfig>{
-            fusebox: {
-                homeDir: this._path.join(config.homeDir),
-                sourceMaps:true,
-                log:true,
-                outFile:"bundle.js",
-                plugins:[
-                    [FuseBoxStatic.SassPlugin(sassOptions),FuseBoxStatic.CSSPlugin()],
-                    FuseBoxStatic.CSSPlugin(),
-                    [FuseBoxStatic.SassPlugin(sassOptions),FuseBoxStatic.CSSResourcePlugin({})],
-                    FuseBoxStatic.CSSResourcePlugin({}),
-                    FuseBoxStatic.HTMLPlugin(),
-                    PugPlugin({
-                        useDefault:true,
-                        hmr:false
-                    })
-                ]
-            },
+            fusebox: fuseOptions,
+            bundleExpression:config.dev.bundleExpression,
             outDir:this._path.join(config.homeDir,"..",config.dev.outputDir),
             sco:this._options.sco,
             server:serverOptions,

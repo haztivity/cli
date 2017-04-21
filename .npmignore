@@ -2,7 +2,11 @@ build
 examples
 node_modules
 .idea
-test
+.fusebox
+test/bundles
+test/course
+haztivitycli.config.ts
+haztivitycli.config.js
 *.log
 gulpfile.js
 ### JetBrains template

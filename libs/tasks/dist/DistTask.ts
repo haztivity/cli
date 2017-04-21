@@ -26,28 +26,26 @@ export class DistTask{
             outputStyle:"compressed"
         };
         let config:IHaztivityCliConfig = this._configService.getConfig();
+        let fuseOptions = this._extend(true,{},config.dist.fusebox);
+        fuseOptions.homeDir= this._path.join(config.homeDir);
+        fuseOptions.plugins=[
+            [FuseBoxStatic.SassPlugin(sassOptions),FuseBoxStatic.CSSPlugin()],
+            FuseBoxStatic.CSSPlugin(),
+            [FuseBoxStatic.SassPlugin(sassOptions),FuseBoxStatic.CSSResourcePlugin({})],
+            FuseBoxStatic.CSSResourcePlugin({}),
+            FuseBoxStatic.HTMLPlugin(),
+            PugPlugin({
+                useDefault:true,
+                hmr:false,
+                pug:{
+                    pretty:false
+                }
+            }),
+            FuseBoxStatic.UglifyJSPlugin(config.dist.uglify)
+        ];
         let fuseTask = new FuseboxTask(<IFuseBoxTaskConfig>{
-            fusebox: {
-                homeDir: this._path.join(config.homeDir),
-                sourceMaps:false,
-                outFile:"bundle.js",
-                log:true,
-                plugins:[
-                    [FuseBoxStatic.SassPlugin(sassOptions),FuseBoxStatic.CSSPlugin()],
-                    FuseBoxStatic.CSSPlugin(),
-                    [FuseBoxStatic.SassPlugin(sassOptions),FuseBoxStatic.CSSResourcePlugin({})],
-                    FuseBoxStatic.CSSResourcePlugin({}),
-                    FuseBoxStatic.HTMLPlugin(),
-                    PugPlugin({
-                        useDefault:true,
-                        hmr:false,
-                        pug:{
-                            pretty:false
-                        }
-                    }),
-                    FuseBoxStatic.UglifyJSPlugin(config.dist.uglify)
-                ]
-            },
+            fusebox: fuseOptions,
+            bundleExpression:config.dist.bundleExpression,
             copy:config.dist.copy,
             outDir:this._path.normalize(config.dist.outputDir),
             sco:this._options.scos[0]
