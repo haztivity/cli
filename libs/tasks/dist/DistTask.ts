@@ -38,7 +38,13 @@ export class DistTask{
                     [FuseBoxStatic.SassPlugin(sassOptions),FuseBoxStatic.CSSResourcePlugin({})],
                     FuseBoxStatic.CSSResourcePlugin({}),
                     FuseBoxStatic.HTMLPlugin(),
-                    PugPlugin(),
+                    PugPlugin({
+                        useDefault:true,
+                        hmr:false,
+                        pug:{
+                            pretty:false
+                        }
+                    }),
                     FuseBoxStatic.UglifyJSPlugin(config.dist.uglify)
                 ]
             },

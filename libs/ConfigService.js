@@ -4,19 +4,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * @license
  * Copyright Davinchi. All Rights Reserved.
  */
-const path = require("path");
-const extend = require("extend");
-const Logger_1 = require("./logger/Logger");
-class ConfigService {
-    constructor() {
+var path = require("path");
+var extend = require("extend");
+var Logger_1 = require("./logger/Logger");
+var ConfigService = (function () {
+    function ConfigService() {
         this._logger = Logger_1.Logger.getInstance();
         this._path = path;
         //protected _logger = Logger.getInstance();
         this._extend = extend;
         this.loadConfig();
     }
-    _readConfigFile() {
-        let result = null;
+    ConfigService.prototype._readConfigFile = function () {
+        var result = null;
         try {
             result = require(this._path.join(process.cwd(), "haztivitycli.config.js"));
             if (result.config) {
@@ -28,22 +28,22 @@ class ConfigService {
             this._logger.error("Fail to read haztivitycli.config.js. Maybe it's malformed?");
         }
         return result;
-    }
-    _processConfig(config) {
+    };
+    ConfigService.prototype._processConfig = function (config) {
         if (config.dist && config.dist.copy) {
-            let copy = config.dist.copy;
-            let homeDir = config.homeDir.replace(/^(\.\\|\.\/)/g, ""); //replace .\ or ./ starts
-            for (let copyPath = 0, copyLength = copy.length; copyPath < copyLength; copyPath++) {
-                let current = copy[copyPath];
+            var copy = config.dist.copy;
+            var homeDir = config.homeDir.replace(/^(\.\\|\.\/)/g, ""); //replace .\ or ./ starts
+            for (var copyPath = 0, copyLength = copy.length; copyPath < copyLength; copyPath++) {
+                var current = copy[copyPath];
                 copy[copyPath] = current.replace("{{homeDir}}", homeDir);
             }
         }
         return config;
-    }
-    loadConfig() {
-        let config = this._readConfigFile();
+    };
+    ConfigService.prototype.loadConfig = function () {
+        var config = this._readConfigFile();
         if (config) {
-            let distCopy = config && config.dist && config.dist.copy ? config.dist.copy : [];
+            var distCopy = config && config.dist && config.dist.copy ? config.dist.copy : [];
             config = this._extend(true, {}, ConfigService.DEFAULTS, config);
             if (distCopy.length > 0) {
                 config.dist.copy = distCopy;
@@ -58,18 +58,19 @@ class ConfigService {
             this._logger.error("haztivitycli.config.js not found. Please init use 'hzcli' and 'init'");
         }
         return this;
-    }
-    getConfig() {
+    };
+    ConfigService.prototype.getConfig = function () {
         this.loadConfig();
         return this._config;
-    }
-    static getInstance() {
+    };
+    ConfigService.getInstance = function () {
         if (!ConfigService._instance) {
             ConfigService._instance = new ConfigService();
         }
         return ConfigService._instance;
-    }
-}
+    };
+    return ConfigService;
+}());
 ConfigService.DEFAULTS = {
     homeDir: "course",
     scoTest: /sco*/i,
@@ -91,4 +92,3 @@ ConfigService.DEFAULTS = {
     logLevel: 2 /* INFO */
 };
 exports.ConfigService = ConfigService;
-//# sourceMappingURL=ConfigService.js.map

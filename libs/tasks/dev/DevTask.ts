@@ -5,7 +5,7 @@
 import * as FuseBoxStatic from "fuse-box";
 import {FuseboxTask,IFuseBoxTaskConfig, IFuseBoxServerOptions} from "../FuseboxTask";
 import {ConfigService, IHaztivityCliConfig} from "../../ConfigService";
-import {PugPlugin} from "fusebox-pug-plugin";
+import {PugPlugin,IPugPluginOptions} from "fusebox-pug-plugin";
 import * as extend from "extend";
 import * as path from "path";
 export interface IDevTaskOptions{
@@ -41,7 +41,10 @@ export class DevTask{
                     [FuseBoxStatic.SassPlugin(sassOptions),FuseBoxStatic.CSSResourcePlugin({})],
                     FuseBoxStatic.CSSResourcePlugin({}),
                     FuseBoxStatic.HTMLPlugin(),
-                    PugPlugin()
+                    PugPlugin({
+                        useDefault:true,
+                        hmr:false
+                    })
                 ]
             },
             outDir:this._path.join(config.homeDir,"..",config.dev.outputDir),
