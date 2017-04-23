@@ -1,16 +1,17 @@
 {
   "name": "@haztivity/cli",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build":"tsc -p libs",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
     "hzcli": "bin/hzcli.js"
   },
   "publishConfig": {
-    "access":"public"
+    "access": "public"
   },
   "repository": {
     "type": "git",
@@ -29,6 +30,7 @@
     "gulp-html-replace": "^1.6.2",
     "loglevel": "^1.4.1",
     "map-stream": "0.0.7",
+    "node-sass": "^4.5.2",
     "q": "^1.5.0",
     "typescript": "^2.2.2",
     "vinyl-fs": "^2.4.4",
@@ -41,9 +43,9 @@
     "@types/node-notifier": "0.0.28",
     "@types/q": "^1.0.0"
   },
-  "types":"./libs/index.ts",
-  "typings":"./libs/index.ts",
+  "types": "./libs/index.ts",
+  "typings": "./libs/index.ts",
   "directories": {
-    "typings":"./libs"
+    "typings": "./libs"
   }
 }
