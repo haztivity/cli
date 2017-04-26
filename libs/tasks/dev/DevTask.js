@@ -18,10 +18,8 @@ class DevTask {
         this._options = this._extend(true, {}, DevTask.DEFAULTS, options);
     }
     run() {
-        let sassOptions = {
-            outputStyle: "expanded"
-        };
         let config = this._configService.getConfig();
+        let sassOptions = this._extend(true, {}, DevTask.SASS_DEFAULTS, config.dev.sass);
         let serverOptions = this._extend(true, {}, config.dev.server || {}, this._options.server);
         let fuseOptions = this._extend(true, {}, config.dev.fusebox);
         fuseOptions.homeDir = this._path.join(config.homeDir);
@@ -48,6 +46,10 @@ class DevTask {
 }
 DevTask.DEFAULTS = {
     server: {}
+};
+DevTask.SASS_DEFAULTS = {
+    outputStyle: "expanded",
+    importer: true
 };
 exports.DevTask = DevTask;
 //# sourceMappingURL=DevTask.js.map

@@ -16,6 +16,10 @@ export class DevTask{
     protected static readonly DEFAULTS={
         server:{}
     };
+    protected static readonly SASS_DEFAULTS = {
+        outputStyle:"expanded",
+        importer:true
+    };
     protected _configService = ConfigService.getInstance();
     protected _options:IDevTaskOptions;
     protected _extend = extend;
@@ -24,10 +28,8 @@ export class DevTask{
         this._options = this._extend(true,{},DevTask.DEFAULTS,options);
     }
     run(){
-        let sassOptions={
-            outputStyle:"expanded"
-        };
         let config:IHaztivityCliConfig = this._configService.getConfig();
+        let sassOptions = this._extend(true,{},DevTask.SASS_DEFAULTS,config.dev.sass);
         let serverOptions = this._extend(true,{},config.dev.server || {},this._options.server);
         let fuseOptions = this._extend(true,{},config.dev.fusebox);
         fuseOptions.homeDir= this._path.join(config.homeDir);

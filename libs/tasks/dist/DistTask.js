@@ -18,10 +18,8 @@ class DistTask {
         this._options = this._extend(true, {}, DistTask.DEFAULTS, options);
     }
     run() {
-        let sassOptions = {
-            outputStyle: "compressed"
-        };
         let config = this._configService.getConfig();
+        let sassOptions = this._extend(true, {}, DistTask.SASS_DEFAULTS, config.dist.sass);
         let fuseOptions = this._extend(true, {}, config.dist.fusebox);
         fuseOptions.homeDir = this._path.join(config.homeDir);
         fuseOptions.plugins = [
@@ -50,5 +48,9 @@ class DistTask {
     }
 }
 DistTask.DEFAULTS = {};
+DistTask.SASS_DEFAULTS = {
+    outputStyle: "compressed",
+    importer: true
+};
 exports.DistTask = DistTask;
 //# sourceMappingURL=DistTask.js.map

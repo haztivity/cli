@@ -14,6 +14,10 @@ export interface IDistTaskOptions{
 export class DistTask{
     protected static readonly DEFAULTS={
     };
+    protected static readonly SASS_DEFAULTS = {
+        outputStyle:"compressed",
+        importer:true
+    };
     protected _configService = ConfigService.getInstance();
     protected _options:IDistTaskOptions;
     protected _extend = extend;
@@ -22,10 +26,8 @@ export class DistTask{
         this._options = this._extend(true,{},DistTask.DEFAULTS,options);
     }
     run(){
-        let sassOptions={
-            outputStyle:"compressed"
-        };
         let config:IHaztivityCliConfig = this._configService.getConfig();
+        let sassOptions = this._extend(true,{},DistTask.SASS_DEFAULTS,config.dist.sass);
         let fuseOptions = this._extend(true,{},config.dist.fusebox);
         fuseOptions.homeDir= this._path.join(config.homeDir);
         fuseOptions.plugins=[
