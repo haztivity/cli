@@ -6,6 +6,7 @@ import * as FuseBoxStatic from "fuse-box";
 import {FuseboxTask,IFuseBoxTaskConfig, IFuseBoxServerOptions} from "../FuseboxTask";
 import {ConfigService, IHaztivityCliConfig} from "../../ConfigService";
 import {PugPlugin,IPugPluginOptions} from "fusebox-pug-plugin";
+import * as autoprefixer from "autoprefixer";
 import * as extend from "extend";
 import * as path from "path";
 export interface IDevTaskOptions{
@@ -35,15 +36,23 @@ export class DevTask{
         fuseOptions.homeDir= this._path.join(config.homeDir);
         fuseOptions.plugins=[
             [FuseBoxStatic.SassPlugin(sassOptions),FuseBoxStatic.CSSPlugin()],
-            FuseBoxStatic.CSSPlugin(),
+            [FuseBoxStatic.CSSPlugin()],
             [FuseBoxStatic.SassPlugin(sassOptions),FuseBoxStatic.CSSResourcePlugin({})],
-            FuseBoxStatic.CSSResourcePlugin({}),
+            [FuseBoxStatic.CSSResourcePlugin({})],
             FuseBoxStatic.HTMLPlugin(),
             PugPlugin({
                 useDefault:true,
                 hmr:false
             })
         ];
+        if (config.dev.autoprefixer) {
+            const autoPref = autoprefixer(config.dev.autoprefixer === true ? null : config.dev.autoprefixer),
+                plugin = FuseBoxStatic.PostCSS([autoPref]);
+            fuseOptions.plugins[0]=  [FuseBoxStatic.SassPlugin(sassOptions),plugin, FuseBoxStatic.CSSPlugin()];
+            fuseOptions.plugins[1] = [plugin,FuseBoxStatic.CSSPlugin()];
+            fuseOptions.plugins[2] = [FuseBoxStatic.SassPlugin(sassOptions), plugin, FuseBoxStatic.CSSResourcePlugin({})];
+            fuseOptions.plugins[3] = [plugin,FuseBoxStatic.CSSResourcePlugin({})];
+        }
         let fuseTask = new FuseboxTask(<IFuseBoxTaskConfig>{
             fusebox: fuseOptions,
             bundleExpression:config.dev.bundleExpression,

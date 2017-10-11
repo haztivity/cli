@@ -29,7 +29,8 @@ export interface IHaztivityCliConfig{
             hmr?:boolean;
         },
         fusebox?:FuseBoxOptions,
-        sass?:Options
+        sass?:Options,
+        autoprefixer?:any
     },
     dist?:{
         bundleExpression?:string;
@@ -37,7 +38,8 @@ export interface IHaztivityCliConfig{
         fusebox?:FuseBoxOptions;
         copy?:string[];
         uglify?:any,
-        sass?:Options
+        sass?:Options,
+        autoprefixer?:any
     },
     logLevel?:LogLevel
 }

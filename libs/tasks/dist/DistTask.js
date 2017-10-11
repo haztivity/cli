@@ -10,6 +10,7 @@ const ConfigService_1 = require("../../ConfigService");
 const fusebox_pug_plugin_1 = require("fusebox-pug-plugin");
 const extend = require("extend");
 const path = require("path");
+const autoprefixer = require("autoprefixer");
 class DistTask {
     constructor(options) {
         this._configService = ConfigService_1.ConfigService.getInstance();
@@ -24,9 +25,9 @@ class DistTask {
         fuseOptions.homeDir = this._path.join(config.homeDir);
         fuseOptions.plugins = [
             [FuseBoxStatic.SassPlugin(sassOptions), FuseBoxStatic.CSSPlugin()],
-            FuseBoxStatic.CSSPlugin(),
+            [FuseBoxStatic.CSSPlugin()],
             [FuseBoxStatic.SassPlugin(sassOptions), FuseBoxStatic.CSSResourcePlugin({})],
-            FuseBoxStatic.CSSResourcePlugin({}),
+            [FuseBoxStatic.CSSResourcePlugin({})],
             FuseBoxStatic.HTMLPlugin(),
             fusebox_pug_plugin_1.PugPlugin({
                 useDefault: true,
@@ -37,6 +38,13 @@ class DistTask {
             }),
             FuseBoxStatic.UglifyJSPlugin(config.dist.uglify)
         ];
+        if (config.dev.autoprefixer) {
+            const autoPref = autoprefixer(config.dev.autoprefixer === true ? null : config.dev.autoprefixer), plugin = FuseBoxStatic.PostCSS([autoPref]);
+            fuseOptions.plugins[0] = [FuseBoxStatic.SassPlugin(sassOptions), plugin, FuseBoxStatic.CSSPlugin()];
+            fuseOptions.plugins[1] = [plugin, FuseBoxStatic.CSSPlugin()];
+            fuseOptions.plugins[2] = [FuseBoxStatic.SassPlugin(sassOptions), plugin, FuseBoxStatic.CSSResourcePlugin({})];
+            fuseOptions.plugins[3] = [plugin, FuseBoxStatic.CSSResourcePlugin({})];
+        }
         let fuseTask = new FuseboxTask_1.FuseboxTask({
             fusebox: fuseOptions,
             bundleExpression: config.dist.bundleExpression,
