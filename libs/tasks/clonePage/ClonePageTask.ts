@@ -2,32 +2,32 @@ import * as path from "path";
 import * as fse from "fs-extra";
 import * as glob from "glob";
 import {Logger} from "../../logger/Logger";
-export interface CopyPageOptions{
+export interface ClonePageOptions{
     /**
-     * Page to copy. Must be a folder
+     * Page to clone. Must be a folder
      */
-    copy?:string;
+    clone?:string;
     /**
-     * Target path for the copy
+     * Target path for the clone
      */
     to?:string;
     /**
-     * Copy the page over writing the existing files. False by default
+     * Clone the page over writing the existing files. False by default
      */
     force?:boolean;
 }
-export class CopyPageTask{
+export class ClonePageTask{
     protected _logger = Logger.getInstance();
-    constructor(protected options:CopyPageOptions){
+    constructor(protected options:ClonePageOptions){
 
     }
     run(){
-        let copy = path.normalize(this.options.copy),
+        let clone = path.normalize(this.options.clone),
             to = path.normalize(this.options.to);
-        if(!fse.pathExistsSync(copy)){
-            throw "Copy path doesn't exists:"+copy;
+        if(!fse.pathExistsSync(clone)){
+            throw "Clone path doesn't exists:"+clone;
         }
-        if(!!path.extname(copy)){
+        if(!!path.extname(clone)){
             throw "The origin must be a directory";
         }
         if(!!path.extname(to)){
@@ -37,8 +37,8 @@ export class CopyPageTask{
         if(this.options.force != true && fse.readdirSync(to).length>0){
             throw "The target must be an empty folder. To overwrite existing files use 'force' option";
         }
-        fse.copySync(copy,to,{overwrite:true,recursive:true});
-        const originName = copy.split(path.sep).pop();
+        fse.copySync(clone,to,{overwrite:true,recursive:true});
+        const originName = clone.split(path.sep).pop();
         const name =  to.split(path.sep).pop();
         //get .ts,.js,.css,.scss
         const files = glob.sync(to+"/*.{ts,js,scss,stylus,less,css,mustache,pug,html,json}", { nodir: true });
