@@ -49,7 +49,6 @@ class DistCommand extends BaseCommand_1.BaseCommand {
         }).run();
     }
     _action(args, cb, command) {
-        console.log(args);
         let options = args.options || {};
         let sco;
         //if sco is provided as option

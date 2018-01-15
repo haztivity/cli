@@ -10,6 +10,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 __export(require("./ConfigService"));
 __export(require("./tasks/dist/DistTask"));
 __export(require("./tasks/dev/DevTask"));
+__export(require("./tasks/copyPage/CopyPageTask"));
 __export(require("./logger/Logger"));
 __export(require("./logger/Pretty"));
 //# sourceMappingURL=index.js.map

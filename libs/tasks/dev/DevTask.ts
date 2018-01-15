@@ -25,8 +25,16 @@ export class DevTask{
     protected _options:IDevTaskOptions;
     protected _extend = extend;
     protected _path = path;
+    protected _fuseTask:FuseboxTask;
     constructor(options:IDevTaskOptions){
         this._options = this._extend(true,{},DevTask.DEFAULTS,options);
+    }
+    cancel(){
+        if(this._fuseTask){
+            try{
+                this._fuseTask.cancel();
+            }catch(e){}
+        }
     }
     run(){
         let config:IHaztivityCliConfig = this._configService.getConfig();
@@ -60,6 +68,7 @@ export class DevTask{
             sco:this._options.sco,
             server:serverOptions,
         });
-        fuseTask.devServer();
+        this._fuseTask = fuseTask;
+        return fuseTask.devServer();
     }
 }

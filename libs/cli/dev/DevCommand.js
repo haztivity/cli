@@ -71,13 +71,18 @@ class DevCommand extends BaseCommand_1.BaseCommand {
         for (let option in options) {
             server[option] = options[option];
         }
-        new this._DevTask({
+        this._task = new this._DevTask({
             sco: sco,
             server: server
-        }).run();
+        });
+        return this._task.run();
+    }
+    _cancel() {
+        if (this._task) {
+            this._task.cancel();
+        }
     }
     _action(args, cb, command) {
-        console.log(args);
         let options = args.options || {};
         let sco;
         //if sco is provided as option

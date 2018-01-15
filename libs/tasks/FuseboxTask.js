@@ -83,6 +83,11 @@ class FuseboxTask {
         });
         return defer.promise;
     }
+    cancel() {
+        if (this._server) {
+            this._server.httpServer.app.listen().close();
+        }
+    }
     devServer() {
         this._logger.info(`Dev server for sco ${this._logger.color.cyan(this._options.sco)}`);
         let fuse = this._initFuse();
@@ -90,7 +95,7 @@ class FuseboxTask {
         let promise = this._injectBundlePath(this._path.resolve(this._homeDir, this._options.sco, "**", "*.html"), this._outFile);
         promise.then(() => {
             this._logger.trace(`Bundle: sco path ${this._logger.color.cyan(this._path.resolve(this._options.fusebox.homeDir, this._options.sco))} to ${this._logger.color.cyan(this._path.resolve(this._outFile))}`);
-            fuse.devServer(this._options.bundleExpression.replace("{{sco}}", this._options.sco).replace("\\", "/"), this._options.server);
+            this._server = fuse.devServer(this._options.bundleExpression.replace("{{sco}}", this._options.sco).replace("\\", "/"), this._options.server);
         });
     }
 }

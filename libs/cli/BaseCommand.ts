@@ -59,6 +59,9 @@ export abstract class BaseCommand{
     protected abstract _action(args,cb,command);
     protected abstract _validate(args):boolean;
     protected abstract _autocomplete():string[];
+    protected _cancel(){
+
+    }
     register(){
         let that = this;
         let command = this._program.command(this._createCommand())
@@ -76,5 +79,8 @@ export abstract class BaseCommand{
             args.push(this);
             that._action.apply(that,args);
         });
+        command.cancel(function(){
+            that._cancel();
+        })
     }
 }

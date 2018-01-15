@@ -18,6 +18,14 @@ class DevTask {
         this._path = path;
         this._options = this._extend(true, {}, DevTask.DEFAULTS, options);
     }
+    cancel() {
+        if (this._fuseTask) {
+            try {
+                this._fuseTask.cancel();
+            }
+            catch (e) { }
+        }
+    }
     run() {
         let config = this._configService.getConfig();
         let sassOptions = this._extend(true, {}, DevTask.SASS_DEFAULTS, config.dev.sass);
@@ -49,7 +57,8 @@ class DevTask {
             sco: this._options.sco,
             server: serverOptions,
         });
-        fuseTask.devServer();
+        this._fuseTask = fuseTask;
+        return fuseTask.devServer();
     }
 }
 DevTask.DEFAULTS = {

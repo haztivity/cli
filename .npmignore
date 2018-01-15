@@ -2,6 +2,8 @@ build
 examples
 node_modules
 .idea
+.git
+.gitignore
 .fusebox
 test/bundles
 test/course

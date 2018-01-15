@@ -38,6 +38,8 @@ class BaseCommand {
         }
         return result.join(" ");
     }
+    _cancel() {
+    }
     register() {
         let that = this;
         let command = this._program.command(this._createCommand())
@@ -54,6 +56,9 @@ class BaseCommand {
         command.action(function (...args) {
             args.push(this);
             that._action.apply(that, args);
+        });
+        command.cancel(function () {
+            that._cancel();
         });
     }
 }
