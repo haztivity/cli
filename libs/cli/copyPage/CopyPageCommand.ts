@@ -65,7 +65,7 @@ export class CopyPageCommand extends BaseCommand{
         if(!args.copy){
             prompts.push({
                 name:"copy",
-                message:"Ruta del directorio con la página a copiar"
+                message:"Ruta del directorio con la página a copiar: "
             });
         }
             //prompt
@@ -73,7 +73,7 @@ export class CopyPageCommand extends BaseCommand{
         if(!args.to){
             prompts.push({
                 name:"to",
-                message:"Directorio de destino"
+                message:"Directorio de destino: "
             });
         }
             //promt
