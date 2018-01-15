@@ -89,17 +89,17 @@ class ClonePageCommand extends BaseCommand_1.BaseCommand {
         let options = args.options || {};
         let sco;
         let prompts = [];
-        if (!args.to) {
-            prompts.push({
-                name: "to",
-                message: "Directorio de destino: "
-            });
-        }
         //if clone is not provided
         if (!args.clone) {
             prompts.push({
                 name: "clone",
                 message: "Ruta del directorio con la página a clone: "
+            });
+        }
+        if (!args.to) {
+            prompts.push({
+                name: "to",
+                message: "Directorio de destino: "
             });
         }
         if (args.clone && args.to) {
