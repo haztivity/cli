@@ -17,7 +17,7 @@ import * as Sparky from "fuse-box/sparky";
 import {PugPlugin} from "fusebox-pug-plugin";
 import * as path from "path";
 import * as extend from "extend";
-import {BundlerOptions} from "./BundlerOptions";
+import {ScoBundlerOptions} from "./BundlerOptions";
 import {BundleProducer} from "fuse-box/core/BundleProducer";
 import {SparkFlow} from "fuse-box/sparky/SparkFlow";
 import {
@@ -26,31 +26,21 @@ import {
 } from "fuse-box/devServer/Server";
 
 /**
- * Default options
- */
-export let DefaultBundlerOptions:BundlerOptions ={
-    isProduction:false,
-    homeDir:"course",
-    homeDist:"dist",
-    mainTsFile:"index.ts",
-    outputFile:"$name.js",
-    server:{
-        root:".",
-        port:4444
-    }
-};
-/**
- * Represents a bundler for a sco. Ready to go
+ * Represents a bundle for a sco.
  * @use [fuse-box](https://fuse-box.org)
  */
-export class Bundler {
-    protected opts: BundlerOptions;
+export class HzBundle {
+    /**
+     * Name of the sco.
+     * Will be used to name the fusebox bundle
+     */
+    protected sco:string;
     /**
      * Fusebox instance
      */
     protected fuse: FuseBox;
     /**
-     * Registered bundles. The key is the name of the bundle
+     * Fusebox bundles. The key is the name of the bundle
      * @type {Map<string, Bundle>}
      */
     protected bundles: Map<string, Bundle> = new Map();
@@ -58,18 +48,10 @@ export class Bundler {
      * Sparky flow for watching files
      */
     protected assetsFlow: SparkFlow;
-
-    constructor(options: BundlerOptions = {}) {
-        this.opts = this.getOptions(options);
-    }
-
-
-
-    /**
-     * Set the bundler for production
-     */
-    setProduction() {
-        this.opts.isProduction = true;
+    protected producer;
+    constructor(sco:string,producer) {
+        this.sco = sco;
+        this.producer = producer;
     }
 
     /**
@@ -77,7 +59,7 @@ export class Bundler {
      * @returns {string}
      */
     getScoPath() {
-        return `${this.opts.homeDir}/${this.opts.sco}`;
+        return `${this.producer.opts.homeDir}/${this.sco}`;
     }
 
     /**
@@ -85,15 +67,15 @@ export class Bundler {
      * @returns {string}
      */
     getDistPath() {
-        return `${this.opts.homeDist}/${this.opts.sco}`;
+        return `${this.producer.opts.homeDist}/${this.sco}`;
     }
 
     /**
-     * Initialize the fusebox with the configuration defined in getConfig
+     * Initialize the fusebox with the configuration defined in getFuseConfig
      * @returns {FuseBox}
      */
     initFuseBox(): FuseBox {
-        this.fuse = FuseBox.init(this.getConfig());
+        this.fuse = FuseBox.init(this.getFuseConfig());
         return this.fuse;
     }
 
@@ -111,7 +93,7 @@ export class Bundler {
      * @returns {Promise<void>}
      */
     async copyAssets() {
-        await Sparky.src(this.getAssetsToHandle(), {base: this.opts.homeDir}).dest(this.opts.homeDist).exec();
+        await Sparky.src(this.getAssetsToHandle(), {base: this.producer.opts.homeDir}).dest(this.producer.opts.homeDist).exec();
     }
 
     /**
@@ -119,7 +101,7 @@ export class Bundler {
      * @returns {Promise<void>}
      */
     watchAssets():SparkFlow {
-        this.assetsFlow = Sparky.watch(this.getAssetsToHandle(), {base: this.opts.homeDir}).dest(this.opts.homeDist);
+        this.assetsFlow = Sparky.watch(this.getAssetsToHandle(), {base: this.producer.opts.homeDir}).dest(this.producer.opts.homeDist);
         this.assetsFlow.exec();
         return this.assetsFlow;
     }
@@ -137,22 +119,23 @@ export class Bundler {
      * Run the development mode of fusebox
      */
     dev(){
-        this.fuse.dev(this.opts.server,this.opts.serverFn);
+        this.fuse.dev(this.producer.opts.server,this.producer.opts.serverFn);
     }
     /**
      * Run the fusebox bundler
      * @param opts
      */
     async run(opts?: any): Promise<BundleProducer> {
+        if(this.producer.isProduction){
+            await this.copyAssets();
+        }else{
+            this.watchAssets();
+        }
+        this.initFuseBox();
+        this.createBundles();
         return await this.fuse.run(opts);
     }
-    /**
-     * Get the options for the bundler merging the constructor parameters with the default options
-     * @param {BundlerOptions} options
-     */
-    protected getOptions(options: BundlerOptions): BundlerOptions {
-        return extend(true, {}, DefaultBundlerOptions, options);
-    }
+
 
     /**
      * Get an array of Globs with the assets to copy/watch.
@@ -162,8 +145,8 @@ export class Bundler {
      */
     protected getAssetsToHandle(): String[] {
         return [
-            path.join(this.opts.sco, "**.(jpg|jpeg|png|gif|svg)"),
-            path.join(this.opts.sco, "**.(ttf|otf|woff|woff2|eot)")
+            path.join(this.sco, "**.(jpg|jpeg|png|gif|svg)"),
+            path.join(this.sco, "**.(ttf|otf|woff|woff2|eot)")
         ];
     }
 
@@ -191,7 +174,7 @@ export class Bundler {
                 useDefault: false,
             }),
             PugPlugin(),
-            this.opts.isProduction && UglifyESPlugin()
+            this.producer.isProduction && UglifyESPlugin()
         ];
     }
 
@@ -199,14 +182,14 @@ export class Bundler {
      * Get the fusebox options to use. Use the plugins of getPlugins
      * @returns {FuseBoxOptions}
      */
-    protected getConfig(): FuseBoxOptions {
+    protected getFuseConfig(): FuseBoxOptions {
         return {
-            homeDir: this.opts.homeDir,
-            output: path.join(this.getDistPath(), this.opts.outputFile),
+            homeDir: this.producer.opts.homeDir,
+            output: path.join(this.getDistPath(), this.producer.opts.outputFile),
             target: "browser",
-            hash: this.opts.isProduction,
-            cache: false,
-            sourceMaps: !this.opts.isProduction,
+            hash: this.producer.isProduction,
+            cache: this.producer.opts.cache,
+            sourceMaps: !this.producer.isProduction,
             plugins: this.getPlugins()
         }
     }
@@ -219,12 +202,12 @@ export class Bundler {
      * @returns {Bundle}
      */
     protected createScoBundle(): Bundle {
-        const sco = this.fuse.bundle(this.opts.sco);
-        if (!this.opts.isProduction) {
+        const sco = this.fuse.bundle(this.sco);
+        if (!this.producer.isProduction) {
             sco.watch();
         }
-        sco.instructions(`>[${this.opts.sco}/${this.opts.mainTsFile}]`);
-        this.bundles.set(this.opts.sco, sco);
+        sco.instructions(`>[${this.sco}/${this.producer.opts.mainTsFile}]`);
+        this.bundles.set(this.sco, sco);
         return sco;
     }
 
@@ -237,10 +220,10 @@ export class Bundler {
      */
     protected createVendorBundle(): Bundle {
         const vendor = this.fuse.bundle("vendor");
-        if (!this.opts.isProduction) {
+        if (!this.producer.isProduction) {
             vendor.watch();
         }
-        vendor.instructions(`~ ${this.opts.sco}/${this.opts.mainTsFile}`);
+        vendor.instructions(`~ ${this.sco}/${this.producer.opts.mainTsFile}`);
         this.bundles.set("vendor", vendor);
         return vendor;
     }

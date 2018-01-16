@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 
-import {HzCli} from "../core";
+import {
+    HzBundler,
+    HzCli
+} from "../core";
 
 let program = require('..');
 
@@ -9,5 +12,7 @@ program
     .parse(process.argv);
 //load hzcli if exists
 //create context
-//register bundlers
-const context = HzCli.getInstance().createContext();
+//register bundles
+const bundler:HzBundler = hzCli.initBundler();
+bundler.bundle("sco1111");
+bundler.run();

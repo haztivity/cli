@@ -2,18 +2,21 @@
  * @license
  * Copyright Davinchi. All Rights Reserved.
  */
-import {HzCli,Bundler} from "./src";
+import {HzCli,HzProducer} from "./src";
 import {FuseBoxOptions} from "fuse-box";
-import {BundlerOptions} from "./src/core";
-HzCli.getInstance().useBundler(class extends Bundler{
-    getOptions(opts:BundlerOptions={}):BundlerOptions{
-        opts.server = {
-            root:"."
-        };
-        return super.getOptions(opts);
+import {
+    HzBundle,
+    HzProducerOptions
+} from "./src/core";
+export default HzCli.init({
+    bundler: {
+        server: {
+            root: "."
+        }
     }
-    getConfig():FuseBoxOptions{
-        let config:FuseBoxOptions = super.getConfig();
+}).useBundle(class extends HzBundle{
+    getFuseConfig():FuseBoxOptions{
+        let config:FuseBoxOptions = super.getFuseConfig();
         config.shim = {
             jquery: {
                 source: "node_modules/jquery/dist/jquery.js",

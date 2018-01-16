@@ -1,37 +1,30 @@
 /**
  * @module core
- *//** */
-import {
+ */import {
     Server,
     ServerOptions
 } from "fuse-box/devServer/Server";
 
-/**
- * Options for the Bundler
- */
-export interface BundlerOptions{
+/** */
+export interface HzProducerOptions{
     /**
-     * Name of the sco to bundle
-     */
-    sco?:string;
-    /**
-     * Is production
-     */
-    isProduction?:boolean;
-    /**
-     * Home dir for fuse
+     * Home dir for fuse.
+     * This will be passed to bundles in the task.
+     * This will be also used as base path for the assets
      * @see [FuseBox homeDir](https://fuse-box.org/page/configuration#home-directory)
      * @type {string}
      */
     homeDir?:string;
     /**
      * Directory where to write the bundles
+     * This will be passed to bundles in the task.
+     * This will be also used as base path for the assets
      * @type {string}
      */
     homeDist?:string;
     /**
-     * Main typescript file.
-     * Will be used in the instructions call
+     * Main typescript file for the bundles.
+     * Will be used in the fusebox instructions call
      */
     mainTsFile?:string;
     /**
