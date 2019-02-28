@@ -1,6 +1,6 @@
 {
   "name": "@haztivity/cli",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -50,7 +50,7 @@
     "@types/q": "^1.0.0"
   },
   "peerDependencies": {
-     "node-sass": "^4.11.0"
+    "node-sass": "^4.11.0"
   },
   "types": "./libs/index.ts",
   "typings": "./libs/index.ts",
