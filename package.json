@@ -47,8 +47,10 @@
     "@types/glob": "^5.0.34",
     "@types/loglevel": "^1.4.29",
     "@types/node-notifier": "0.0.28",
-    "@types/node-sass": "^3.10.32",
     "@types/q": "^1.0.0"
+  },
+  "peerDependencies": {
+     "node-sass": "^4.11.0"
   },
   "types": "./libs/index.ts",
   "typings": "./libs/index.ts",
