@@ -41,7 +41,8 @@ class DevTask {
             fusebox_pug_plugin_1.PugPlugin({
                 useDefault: true,
                 hmr: false
-            })
+            }),
+            FuseBoxStatic.ReplacePlugin({ "process.env.NODE_ENV": JSON.stringify("dev") })
         ];
         if (config.dev.autoprefixer) {
             const autoPref = autoprefixer(config.dev.autoprefixer === true ? null : config.dev.autoprefixer), plugin = FuseBoxStatic.PostCSS([autoPref]);

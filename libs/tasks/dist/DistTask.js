@@ -36,6 +36,7 @@ class DistTask {
                     pretty: false
                 }
             }),
+            FuseBoxStatic.ReplacePlugin({ "process.env.NODE_ENV": JSON.stringify("prod") }),
             FuseBoxStatic.UglifyJSPlugin(config.dist.uglify)
         ];
         if (config.dev.autoprefixer) {
